@@ -14,9 +14,9 @@ DOMAIN=$1
 EMAIL=$2
 BURP_INSTALLATOR="$3"
 
-if [ ! -f /usr/local/BurpSuitePro/BurpSuitePro ]; then
+if [ ! -f /usr/local/bin/BurpSuitePro ]; then
   if [ -z "$BURP_INSTALLATOR" ]; then
-    echo "Install Burp to /usr/local/BurpSuitePro and run script again or provide a path to burp installer script"
+    echo "Install Burp to /usr/local/bin/BurpSuitePro and run script again or provide a path to burp installer script"
     echo "Usage: $0 $DOMAIN email@address.com [burp-installation-path.sh]"
     exit
   elif [ ! -f "$BURP_INSTALLATOR" ]; then
@@ -24,8 +24,8 @@ if [ ! -f /usr/local/BurpSuitePro/BurpSuitePro ]; then
     exit
   fi
   bash "$BURP_INSTALLATOR" -q
-  if [ ! -f /usr/local/BurpSuitePro/BurpSuitePro ]; then
-    echo "Burp Suite Pro was not installed correctly. Please install it manually to /usr/local/BurpSuitePro and run the installer script again"
+  if [ ! -f /usr/local/bin/BurpSuitePro ]; then
+    echo "Burp Suite Pro was not installed correctly. Please install it manually to /usr/local/bin/BurpSuitePro and run the installer script again"
     exit
   fi
 fi
