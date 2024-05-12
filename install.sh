@@ -76,6 +76,9 @@ ln -s /snap/bin/certbot /usr/bin/certbot
 
 apt update -y && apt install -y python3 python3-dnslib
 
+# to create a random metrics path
+METRICS=`LC_CTYPE=C tr -dc A-Za-z0-9 < /dev/urandom | fold -w 10 | head -1`
+
 mkdir -p /usr/local/collaborator/
 cp "$SRC_PATH/dnshook.sh" /usr/local/collaborator/
 cp "$SRC_PATH/cleanup.sh" /usr/local/collaborator/
@@ -83,6 +86,7 @@ cp "$SRC_PATH/collaborator.config" /usr/local/collaborator/collaborator.config
 sed -i "s/INT_IP/$MYPRIVATEIP/g" /usr/local/collaborator/collaborator.config
 sed -i "s/EXT_IP/$MYPUBLICIP/g" /usr/local/collaborator/collaborator.config
 sed -i "s/BDOMAIN/$DOMAIN/g" /usr/local/collaborator/collaborator.config
+sed -i "s/burp-metrics-path/$METRICS/g" /usr/local/collaborator/collaborator.config
 cp "$SRC_PATH/burpcollaborator.service" /etc/systemd/system/
 cp "$SRC_PATH/startcollab.sh" /usr/local/collaborator/
 cp "$SRC_PATH/renewcert.sh" /etc/cron.daily/renewcert
@@ -115,3 +119,28 @@ certbot certonly --manual-auth-hook "/usr/local/collaborator/dnshook.sh $MYPRIVA
 
 CERT_PATH=/etc/letsencrypt/live/$DOMAIN
 ln -s $CERT_PATH /usr/local/collaborator/keys
+
+echo 
+echo SUCCESS! Burp is now running with the letsencrypt certificate for domain *.$DOMAIN
+echo
+echo Your metrics path was set to $METRICS. Change addressWhitelist to access it remotely.
+
+# removing the listener to port 53
+# Check if the DNSStubListener line exists and is commented out
+if grep -q "^#DNSStubListener=" /etc/systemd/resolved.conf; then
+    # Uncomment the line and set its value to no
+    sudo sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/' /etc/systemd/resolved.conf
+elif grep -q "^DNSStubListener=" /etc/systemd/resolved.conf; then
+    # The line exists, ensure it's set to no
+    sudo sed -i 's/^DNSStubListener=.*/DNSStubListener=no/' /etc/systemd/resolved.conf
+else
+    # The line doesn't exist, append it
+    echo "DNSStubListener=no" | sudo tee -a /etc/systemd/resolved.conf > /dev/null
+fi
+
+# Restart systemd-resolved to apply changes
+sudo systemctl restart systemd-resolved
+
+sudo rm /etc/resolv.conf
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+echo "nameserver 8.8.4.4" | sudo tee -a /etc/resolv.conf
