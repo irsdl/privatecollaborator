@@ -1,12 +1,6 @@
-# Updates Over the Original Repository
-* Updated `install.sh` to:
-  - Use `burp-installer-script.sh` to install Burp Suite Pro or create a symlink for `/usr/local/bin/BurpSuitePro` if it does not exists
-  - Randomize `burp-metrics-path` for enhanced security.
-  - Disable listening on port 53 by default in Ubuntu to set up Collaborator with no issues on port 53
-* Changed polling ports to HTTP(S) defaults.
-* Updated the README to reflect these changes and provide additional usage information.
+# Burp Suite - Private Collaborator server
 
-# Burp Suite - Private collaborator server
+This is a modified fork by Soroush Dalili.
 
 A script for installing private Burp Collaborator with Let's Encrypt SSL-certificate. Requires an Ubuntu virtual machine and public IP-address.
 
@@ -18,27 +12,45 @@ Please see the below blog post for usage instructions:
 
 [https://teamrot.fi/self-hosted-burp-collaborator-with-custom-domain/](https://teamrot.fi/self-hosted-burp-collaborator-with-custom-domain/)
 
-## Setup:
+# Updates over the original repository
+* Updated `install.sh` to make the setup easier and slightly safer:
+  - Use `burp-installer-script.sh` to install Burp Suite Pro or create a symlink for `/usr/local/bin/BurpSuitePro` if it does not exists
+  - Randomize `burp-metrics-path` for enhanced security.
+  - Disable listening on port 53 by default in Ubuntu to set up Collaborator with no issues on port 53
+* Changed polling ports
+* Updated the README to reflect the changes and provide additional information.
 
-0. Ensure DNS keys are in place
-1. Clone this repository.
-2. Install Burp to /usr/local/bin/BurpSuitePro using `burp-installer-script.sh`.
-2.1. If you already have a BurpSuitePro installed, create a symlink `ln -s "/somepath/BurpSuitePro" "/usr/local/bin/BurpSuitePro"`
-3. Run `sudo ./install.sh yourdomain.fi your@email.fi` (the email is for Let's Encrypt expiry notifications).
-4. You should now have Let's encrypt certificate for the domain and a private burp collaborator properly set up.
-5. Start the collaborator with `sudo service burpcollaborator start`.
-6. Configure your Burp Suite Professional to use it.
-7. ????
-8. Profit.
+## How to use:
 
-**Commands based on the instructions above:
+1. Ensure DNS keys are in place, here is an example for `bc.yourdomain.fi` as the used Burp Collaborator subdomain:
+	```
+	bc    IN    NS    ns1.yourdomain.fi.
+	ns1     IN      A       1.2.3.4
+	```
+2. Clone this repository.
+3. Install Burp to /usr/local/bin/BurpSuitePro using `burp-installer-script.sh`.
+4. Run `sudo ./install.sh yourdomain.fi your@email.fi` (the email is for Let's Encrypt expiry notifications).
+5. You should now have Let's encrypt certificate for the domain and a private burp collaborator properly set up.
+6. Start the collaborator with `sudo service burpcollaborator start`.
+7. Ensure that the service is run after a reboot `sudo systemctl enable burpcollaborator`
+8. Configure your Burp Suite Professional to use it. Here is an example when custom ports for polling is used (Settings > Project > Collaborator):
+	```
+	Server location: bc.yourdomain.fi
+	Polling location: bc.yourdomain.fi:8443
+	```
+
+**Install commands based on the instructions above:**
 
 ```
 git clone https://github.com/irsdl/privatecollaborator
 cd privatecollaborator
-./install.sh
+./install.sh yourdomain.fi your@email.fi
+sudo service burpcollaborator start
+sudo systemctl enable burpcollaborator
 ```
 
 ### Important note:
 
-As stated in [the blog post](https://teamrot.fi/self-hosted-burp-collaborator-with-custom-domain/), be sure to firewall the ports 9443 and 9090 properly to allow connections only from your own Burp Suite computer IP address. Otherwise everyone in the internet can use your collaborator server!
+When utilizing custom ports (8443 and 8080) for polling on your Collaborator server, it is possible to restrict access to these ports to specific IP addresses. This enhances security by keeping your Collaborator server private. However, configuring such restrictions can be challenging if the server must accommodate connections from various environments or dynamically changing IP addresses. This is especially the case when the collaborator server needs to be used by various consultants using differnet locations or network requirements.
+
+As stated in [the blog post](https://teamrot.fi/self-hosted-burp-collaborator-with-custom-domain/), be sure to firewall the ports 8443 and 8080 properly to allow connections only from your own Burp Suite computer IP address. Otherwise everyone in the internet can use your collaborator server!

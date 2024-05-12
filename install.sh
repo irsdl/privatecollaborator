@@ -92,7 +92,25 @@ METRICS=`LC_CTYPE=C tr -dc A-Za-z0-9 < /dev/urandom | fold -w 10 | head -1`
 mkdir -p /usr/local/collaborator/
 cp "$SRC_PATH/dnshook.sh" /usr/local/collaborator/
 cp "$SRC_PATH/cleanup.sh" /usr/local/collaborator/
-cp "$SRC_PATH/collaborator.config" /usr/local/collaborator/collaborator.config
+
+# Ask the user if they want the polling service to use different ports
+echo "Do you want the polling service to use different ports to restrict its requests in the future? (yes/no)"
+read answer
+
+# Normalize the answer to lower case to handle variations like Yes, YES, yEs, etc.
+answer=$(echo "$answer" | tr '[:upper:]' '[:lower:]')
+
+# Check the user's answer
+if [[ "$answer" == "yes" ]]; then
+    # If the answer is yes, copy the custom polling ports config
+    cp "$SRC_PATH/collaborator_custom_pollling_ports.config" /usr/local/collaborator/collaborator.config
+    echo "Custom polling ports configuration has been applied. Use $DOMAIN:8443 (HTTPS) and $DOMAIN:8080 (HTTP)"
+else
+    # Otherwise, copy the no polling ports config
+    cp "$SRC_PATH/collaborator_no_polling_ports.config" /usr/local/collaborator/collaborator.config
+    echo "No polling ports configuration has been applied."
+fi
+
 sed -i "s/INT_IP/$MYPRIVATEIP/g" /usr/local/collaborator/collaborator.config
 sed -i "s/EXT_IP/$MYPUBLICIP/g" /usr/local/collaborator/collaborator.config
 sed -i "s/BDOMAIN/$DOMAIN/g" /usr/local/collaborator/collaborator.config
@@ -152,5 +170,5 @@ fi
 sudo systemctl restart systemd-resolved
 
 sudo rm /etc/resolv.conf
-echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
-echo "nameserver 8.8.4.4" | sudo tee -a /etc/resolv.conf
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf >/dev/null
+echo "nameserver 8.8.4.4" | sudo tee -a /etc/resolv.conf >/dev/null
