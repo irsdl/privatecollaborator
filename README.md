@@ -22,10 +22,10 @@ Please see the below blog post for usage instructions:
 
 ## How to use:
 
-1. Ensure DNS keys are in place, here is an example for `bc.yourdomain.fi` as the used Burp Collaborator subdomain:
+1. Ensure DNS keys are in place, here is an example for `bc.yourdomain.fi` as the used Burp Collaborator subdomain (in Cloudflare, ensure proxy is off):
 	```
 	bc    IN    NS    ns1.yourdomain.fi.
-	ns1     IN      A       1.2.3.4
+	ns1.bc     IN      A       1.2.3.4
 	```
 2. Clone this repository.
 3. Install Burp to /usr/local/bin/BurpSuitePro using `burp-installer-script.sh`.
