@@ -1,3 +1,3 @@
 #!/bin/bash
 
-/usr/local/BurpSuitePro/BurpSuitePro -Xmx200m --collaborator-server --collaborator-config=/usr/local/collaborator/collaborator.config
+/usr/local/bin/BurpSuitePro -XX:MaxRAMPercentage=50 --collaborator-server --collaborator-config=/usr/local/collaborator/collaborator.config
