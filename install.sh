@@ -94,14 +94,14 @@ cp "$SRC_PATH/dnshook.sh" /usr/local/collaborator/
 cp "$SRC_PATH/cleanup.sh" /usr/local/collaborator/
 
 # Ask the user if they want the polling service to use different ports
-echo "Do you want the polling service to use different ports to restrict its requests in the future? (yes/no)"
+echo "Do you want the polling service to use different ports to restrict its requests in the future? (yes/no[default])"
 read answer
 
 # Normalize the answer to lower case to handle variations like Yes, YES, yEs, etc.
 answer=$(echo "$answer" | tr '[:upper:]' '[:lower:]')
 
 # Check the user's answer
-if [[ "$answer" == "yes" ]]; then
+if [[ "$answer" == "yes" || "$answer" == "y" || "$answer" == "1" ]]; then
     # If the answer is yes, copy the custom polling ports config
     cp "$SRC_PATH/collaborator_custom_pollling_ports.config" /usr/local/collaborator/collaborator.config
     echo "Custom polling ports configuration has been applied. Use $DOMAIN:8443 (HTTPS) and $DOMAIN:8080 (HTTP)"
