@@ -6,28 +6,38 @@ if [[ $(id -u) -ne 0 ]]; then
 fi
 
 if [ "$#" -lt 2 ]; then
-  echo "Usage: $0 yourdomain.com email@address.com [burp-installer-script.sh]"
+  echo "Usage: $0 yourdomain.com email@address.com"
   exit 1
 fi
 
 DOMAIN=$1
 EMAIL=$2
-BURP_INSTALLATOR="$3"
+
+# Check if the symlink already exists in /usr/local/bin
+if [ -L "/usr/local/bin/BurpSuitePro" ] || [ -f "/usr/local/bin/BurpSuitePro" ]; then
+    echo "BurpSuitePro is already installed and accessible from /usr/local/bin."
+else
+    # Define the expected installation path
+    installed_path="/usr/local/BurpSuitePro/BurpSuitePro"
+
+    # Find BurpSuitePro in the system path or check the installed path
+    if [ -f "$installed_path" ] || which BurpSuitePro >/dev/null 2>&1; then
+        # Get the actual path from which or use the installed path
+        actual_path=$(which BurpSuitePro 2>/dev/null || echo "$installed_path")
+
+        # Create a symbolic link in /usr/local/bin
+        ln -s "$actual_path" "/usr/local/bin/BurpSuitePro"
+        echo "Symbolic link created for BurpSuitePro in /usr/local/bin."
+    else
+        # If BurpSuitePro is not found, run the installer script
+        echo "BurpSuitePro not found. Running installer script..."
+        ./burp-installer-script.sh
+    fi
+fi
 
 if [ ! -f /usr/local/bin/BurpSuitePro ]; then
-  if [ -z "$BURP_INSTALLATOR" ]; then
-    echo "Install Burp to /usr/local/bin/BurpSuitePro and run script again or provide a path to burp installer script"
-    echo "Usage: $0 $DOMAIN email@address.com [burp-installation-path.sh]"
-    exit
-  elif [ ! -f "$BURP_INSTALLATOR" ]; then
-    echo "Burp installer script ($BURP_INSTALLATOR) does not exist"
-    exit
-  fi
-  bash "$BURP_INSTALLATOR" -q
-  if [ ! -f /usr/local/bin/BurpSuitePro ]; then
     echo "Burp Suite Pro was not installed correctly. Please install it manually to /usr/local/bin/BurpSuitePro and run the installer script again"
     exit
-  fi
 fi
 
 # Make sure that permissions are ok for all scripts.
