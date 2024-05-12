@@ -31,13 +31,13 @@ Please see the below blog post for usage instructions:
 3. Install Burp to /usr/local/bin/BurpSuitePro using `burp-installer-script.sh`.
 4. Run `sudo ./install.sh yourdomain.fi your@email.fi` (the email is for Let's Encrypt expiry notifications).
 5. You should now have Let's encrypt certificate for the domain and a private burp collaborator properly set up.
-6. Start the collaborator with `sudo service burpcollaborator start`.
-7. Ensure that the service is run after a reboot `sudo systemctl enable burpcollaborator`
-8. Configure your Burp Suite Professional to use it. Here is an example when custom ports for polling is used (Settings > Project > Collaborator):
+6. Configure your Burp Suite Professional to use it. Here is an example when custom ports for polling is used (Settings > Project > Collaborator):
 	```
 	Server location: bc.yourdomain.fi
 	Polling location: bc.yourdomain.fi:8443
 	```
+
+The created `burpcollaborator` service is run in the end. It also ensures that it runs after a reboot. The certitficate renewal is also checked daily.
 
 **Install commands based on the instructions above:**
 
@@ -45,8 +45,6 @@ Please see the below blog post for usage instructions:
 git clone https://github.com/irsdl/privatecollaborator
 cd privatecollaborator
 ./install.sh yourdomain.fi your@email.fi
-sudo service burpcollaborator start
-sudo systemctl enable burpcollaborator
 ```
 
 ### Important note:
