@@ -47,6 +47,11 @@ cd privatecollaborator
 ./install.sh yourdomain.fi your@email.fi
 ```
 
+**Troubleshooting**
+
+* The `Service busy; retry later` error from the certbot:
+	certificates need to be recreated. Run the `./install.sh yourdomain.fi your@email.fi` file again.
+
 ### Important note:
 
 When utilizing custom ports (8443 and 8080) for polling on your Collaborator server, it is possible to restrict access to these ports to specific IP addresses. This enhances security by keeping your Collaborator server private. However, configuring such restrictions can be challenging if the server must accommodate connections from various environments or dynamically changing IP addresses. This is especially the case when the collaborator server needs to be used by various consultants using differnet locations or network requirements.
